@@ -69,6 +69,36 @@ class PolicyTests(unittest.TestCase):
         req = {'phase': 'match', 'state': state, 'memory': None}
         self.assertEqual(sp.decide(req), sp.decide(req))
 
+    def test_waiting_bonus(self):
+        sim = Simulator(generate(21, 120))
+        for _ in range(12):
+            sim.resolve_asks(sp.decide({'phase': 'ask', 'state': sim.observe(), 'memory': None})['asks'])
+            sim.advance(sp.decide({'phase': 'match', 'state': sim.observe(), 'memory': None})['pairs'])
+        state = sim.observe()
+        wb = sp.waiting_bonus(state, sp.CFG)
+        served = {x for i in state['introductions'] for x in (i['user_a'], i['user_b'])}
+        self.assertTrue(all(0 <= v <= 1 for v in wb.values()))
+        self.assertFalse(set(wb) & served)
+        self.assertEqual(sp.waiting_bonus(state, sp.make_cfg('r1')), {})
+
+    def test_r1_profile_and_ablation_configs_are_valid(self):
+        for cfg in (sp.make_cfg('r1'), sp.make_cfg('r2', alloc='greedy'), sp.make_cfg('r2', asks='baseline'), sp.make_cfg('r2', soft_asks=True)):
+            sim = Simulator(generate(31, 100, 'eval', 'drift'))
+            for _ in range(40):
+                sim.resolve_asks(sp.decide({'phase': 'ask', 'state': sim.observe(), 'memory': None}, cfg)['asks'])
+                sim.advance(sp.decide({'phase': 'match', 'state': sim.observe(), 'memory': None}, cfg)['pairs'])
+            self.assertGreater(len(sim.introductions), 0)
+
+    def test_constant_prior_ignores_feedback(self):
+        sim = Simulator(generate(41, 100))
+        for _ in range(20):
+            sim.resolve_asks(sp.decide({'phase': 'ask', 'state': sim.observe(), 'memory': None})['asks'])
+            sim.advance(sp.decide({'phase': 'match', 'state': sim.observe(), 'memory': None})['pairs'])
+        state = sim.observe()
+        a = sp.choose_pairs(state, sp.make_cfg('r2'))
+        state['feedback'] = []
+        self.assertEqual(a, sp.choose_pairs(state, sp.make_cfg('r2')))
+
 
 if __name__ == '__main__':
     unittest.main()

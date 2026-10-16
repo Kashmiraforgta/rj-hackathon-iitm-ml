@@ -1,6 +1,12 @@
-# Supply-aware sequential matching policy (Round 2 build)
+# Supply-aware sequential matching policy (Round 2)
 
 Solo entry: Kashmira Matale. Built on the public kit `1.0.0` (commit `a8e26b35118c`).
+
+## Round 2 changes (see report_round2.pdf)
+
+Default policy (`python policy.py`, profile `r2`): same prior for every member, exact daily maximum-weight matching, a waiting-priority bonus (lambda = 2) for members never yet introduced, targeted hard-constraint asks, no soft asks. The Round 1 build is profile `r1` (`python policy.py --baseline r1`). The sections below describe the matching, ask and safety logic, which is unchanged; the "Allocation" bullet's learned propensities apply to `r1` only.
+
+Round 2 evidence: `run_round2.sh` reproduces everything (`r2_eval.py` paired in-process evaluation, `r2_fitpriors.py`, `r2_analyze.py`); raw per-episode results are in `results/*.jsonl`. `sm_policy_r1.py` is the untouched Round 1 file. 9 unit tests: `python -m unittest -v`.
 
 ## What it does
 
@@ -20,7 +26,6 @@ Python 3.10+ (developed on 3.12.3; container uses `python:3.12.7-slim`). No thir
 
 ```bash
 python -m unittest -v
-python verify_data.py
 python evaluate.py --seeds 101,102,103 --variants all --output results/final.json   # default policy is 'sm'
 ./run_all.sh          # all four methods on seeds 101-103, writes results/final_{sm,greedy,no_asks,random}.json
 docker build -t sequential-policy:submission .
@@ -56,4 +61,4 @@ python evaluate.py --image sequential-policy:submission --seeds 101 --output res
 - Outcomes are synthetic. Scores here are not evidence about real people.
 - With about one MSMI event per episode, differences between methods are mostly within noise; see the report.
 - Per-member propensities barely move from their priors within one 60-day episode.
-- Docker was not available in the development environment, so the container build and run have not been executed there. Run the two Docker commands above before submitting.
+- Docker was not available in the development environment, so the container build and run have not been executed there. Run the two Docker commands above before submitting. The official evaluator was run locally for seed 101 only (all six scenarios valid, primary score 0.50).

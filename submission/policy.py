@@ -11,6 +11,8 @@ import sm_policy
 def decide(request, mode='sm'):
     if mode == 'sm':
         return sm_policy.decide(request)
+    if mode == 'r1':
+        return sm_policy.decide(request, sm_policy.make_cfg('r1'))
     state = request['state']
     memory = request.get('memory') or {}
     if request['phase'] == 'ask':
@@ -35,7 +37,7 @@ def decide(request, mode='sm'):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--baseline', choices=['sm', 'greedy', 'no_asks', 'random'], default='sm')
+    parser.add_argument('--baseline', choices=['sm', 'r1', 'greedy', 'no_asks', 'random'], default='sm')
     args = parser.parse_args()
     request = json.load(sys.stdin)
     print(json.dumps(decide(request, args.baseline), allow_nan=False))
