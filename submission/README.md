@@ -61,4 +61,5 @@ python evaluate.py --image sequential-policy:submission --seeds 101 --output res
 - Outcomes are synthetic. Scores here are not evidence about real people.
 - With about one MSMI event per episode, differences between methods are mostly within noise; see the report.
 - Per-member propensities barely move from their priors within one 60-day episode.
-- Docker was not available in the development environment, so the container build and run have not been executed there. Run the two Docker commands above before submitting. The official evaluator was run locally for seed 101 only (all six scenarios valid, primary score 0.50).
+- The container build and run were checked on 17 Oct 2026 (seed 101, all six scenarios valid, primary score 0.5; see results/container_check.json). The official evaluator was run locally for seed 101 only (all six scenarios valid, primary score 0.50).
+

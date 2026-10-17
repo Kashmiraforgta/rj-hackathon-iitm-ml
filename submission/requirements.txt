@@ -1,0 +1,5 @@
+# policy (kit.py, policy.py, sm_policy.py): standard library only
+numpy
+scipy
+matplotlib
+networkx
